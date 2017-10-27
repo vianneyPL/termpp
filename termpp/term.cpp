@@ -10,21 +10,20 @@ namespace term
 
 ctrl term::read_char() noexcept
 {
-    char c;
-    int ret = read(_fd, &c, 1);
-    if (ret < 0)
+    char c1;
     {
-        return ctrl::none;
+        int ret = read(_fd, &c1, 1);
+        if (ret < 0) return ctrl::none;
+    }
+    char c2;
+    {
+        int ret = read(_fd, &c2, 1);
+        if (ret < 0) return ctrl::none;
     }
 
-    if (c == '[' || c == 'O')
+    if (c1 == '[' || c1 == 'O')
     {
-        ret = read(_fd, &c, 1);
-        if (ret < 0)
-        {
-            return ctrl::none;
-        }
-        switch (c)
+        switch (c2)
         {
         case 'A':
             return ctrl::up;
@@ -38,6 +37,37 @@ ctrl term::read_char() noexcept
             return ctrl::end;
         case 'H':
             return ctrl::home;
+        }
+    }
+    if (c1 == '[' && c2 >= '1' && c2 <= '8')
+    {
+        {
+            int ret = read(_fd, &c1, 1);
+            if (ret < 0) return ctrl::none;
+        }
+        /* extended escape */
+        if (c1 == '~')
+        {
+            switch (c2)
+            {
+            case '2':
+                return ctrl::insert;
+            case '3':
+                return ctrl::del;
+            case '5':
+                return ctrl::page_up;
+            case '6':
+                return ctrl::page_down;
+            case '7':
+                return ctrl::home;
+            case '8':
+                return ctrl::end;
+            }
+        }
+        while (c1 != -1 && c1 != '~')
+        {
+            int ret = read(_fd, &c1, 1);
+            if (ret < 0) return ctrl::none;
         }
     }
 }
