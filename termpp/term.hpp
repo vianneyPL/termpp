@@ -40,9 +40,14 @@ public:
         unset_term();
     }
 
-    ctrl read_char() noexcept;
+    void run() noexcept;
 
 private:
+    ctrl read_ctrl() noexcept;
+
+private:
+    std::string _current;
+
 #ifndef _WIN32
     int _fd = STDIN_FILENO;
     struct termios _orig;

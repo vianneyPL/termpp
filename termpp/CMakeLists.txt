@@ -2,6 +2,7 @@ add_library(termpp
     STATIC
     term.cpp
     term.hpp
+    control.hpp
 )
 
 set_target_properties(termpp PROPERTIES LINKER_LANGUAGE CXX)

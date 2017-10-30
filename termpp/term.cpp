@@ -8,7 +8,41 @@ namespace term
 #include <termios.h>
 #include <unistd.h>
 
-ctrl term::read_char() noexcept
+void term::run() noexcept
+{
+    while (true)
+    {
+        char c;
+        {
+            int ret = read(_fd, &c, 1);
+            if (ret < 0) return;
+        }
+        if (c == 27)
+        {
+            auto ctrl = read_ctrl();
+            if (ctrl == ctrl::up)
+            {
+                std::cout << "exit\n\r";
+                break;
+            }
+        }
+        else
+        {
+            _current += c;
+            const auto cl = clear_line();
+            {
+                int ret = write(_fd, cl.c_str(), cl.size());
+                if (ret < 0) return;
+            }
+            {
+                int ret = write(_fd, _current.c_str(), _current.size());
+                if (ret < 0) return;
+            }
+        }
+    }
+}
+
+ctrl term::read_ctrl() noexcept
 {
     char c1;
     {
@@ -70,6 +104,7 @@ ctrl term::read_char() noexcept
             if (ret < 0) return ctrl::none;
         }
     }
+    return ctrl::none;
 }
 
 bool term::is_supported()
@@ -120,7 +155,7 @@ void term::set_term()
 }
 void term::unset_term()
 {
-    tcsetattr(_fd, TCSADRAIN, &_orig) != -1;
+    tcsetattr(_fd, TCSADRAIN, &_orig);
 }
 
 #else /* Windows platform, either MinGW or Visual Studio (MSVC) */
