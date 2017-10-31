@@ -24,5 +24,23 @@ std::vector<std::string> split(const std::string & s, char delim)
     }
     return elems;
 }
+
+constexpr std::size_t length(const char * str)
+{
+    return (*str == 0) ? 0 : length(str + 1) + 1;
+}
+
+template <typename R, typename... Types>
+constexpr std::size_t get_function_arg_count(R (*f)(Types...))
+{
+    return sizeof...(Types);
+}
+
+template <std::size_t I, typename R, typename... Types>
+constexpr auto get_function_arg_type(R (*f)(Types...))
+{
+    auto t = std::tuple<Types...>{};
+    return std::get<I>(t);
+}
 }
 }

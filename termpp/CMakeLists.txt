@@ -3,6 +3,8 @@ add_library(termpp
     term.cpp
     term.hpp
     control.hpp
+    commands.hpp
+    parse.hpp
 )
 
 set_target_properties(termpp PROPERTIES LINKER_LANGUAGE CXX)
