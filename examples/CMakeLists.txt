@@ -1,5 +1,5 @@
 add_executable(example_termpp
-    test.cpp
+    main.cpp
 )
 
 target_link_libraries(example_termpp

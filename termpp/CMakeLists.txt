@@ -7,6 +7,12 @@ add_library(termpp
     parse.hpp
 )
 
+add_subdirectory(utils)
+
+target_link_libraries(termpp
+    utils
+)
+
 set_target_properties(termpp PROPERTIES LINKER_LANGUAGE CXX)
 
 

@@ -1,7 +1,6 @@
+#include <commands.hpp>
 #include <control.hpp>
 #include <iostream>
-#include <string>
-#include <tuple>
 #include <term.hpp>
 
 constexpr int func(int a)
@@ -15,58 +14,42 @@ void h(int a, std::string b)
 }
 
 template <typename T>
-T parse(std::string arg);
-
-template <>
-int parse<int>(std::string arg)
+void print(T && t)
 {
-    return std::atoi(arg.c_str());
+    std::cout << __PRETTY_FUNCTION__ << '\n';
 }
 
-template <>
-std::string parse<std::string>(std::string arg)
+auto prepare()
 {
-    return arg;
+    auto l = [](int a) { std::cout << "a: " << a << '\n'; };
+    return term::commands(  //
+        term::cmd("cmd", h) //
+        ,
+        term::cmd("asd", l) //
+    );
 }
-
-template <typename R, typename... Types>
-constexpr std::size_t get_function_arg_count(R (*f)(Types...))
-{
-    return sizeof...(Types);
-}
-
-template <std::size_t I, typename R, typename... Types>
-constexpr auto get_function_arg_type(R (*f)(Types...))
-{
-    auto t = std::tuple<Types...>{};
-    return std::get<I>(t);
-}
-
-template <typename F, std::size_t... I>
-void parser_impl(const std::vector<std::string> & tokens, F && f, std::index_sequence<I...>)
-{
-    f(parse<decltype(get_function_arg_type<I>(f))>(tokens.at(I + 1))...);
-}
-
-template<std::size_t N, typename F, typename Indices = std::make_index_sequence<N>>
-void parser(const std::vector<std::string> & tokens, F &&f)
-{
-    parser_impl(tokens, f, Indices{});
-}
-
-template <typename F>
-void caller(F && f, std::string to_parse)
-{
-    const auto tokens = term::internal::split(to_parse, ' ');
-    parser<get_function_arg_count(f)>(tokens, f);
-}
-
 
 int main()
 {
-    std::string command{"cmd 3 str"};
+    std::string cmd{"cmd 3 str"};
+    std::string asd{"asd 3 str"};
 
-    caller(h, command);
+    auto c = prepare();
+
+    c.call(cmd);
+    c.call(asd);
+
+    // print(c);
+
+    // auto c = term::commands(
+    //     term::cmd("cmd", h)
+    //     // , term::cmd("cmd2", [](int a) { std::cout  << "a: " << a << '\n'; })
+    // );
+    // print(c);
+
+    // auto c = term::make_commands();
+
+    // caller(command);
 
     // constexpr auto l = [](int a) { return 2 * a; };
     // constexpr term::control ctrl{std::string_view{"asd", 3}, func};
