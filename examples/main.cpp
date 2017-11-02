@@ -1,7 +1,7 @@
-#include <commands.hpp>
-#include <control.hpp>
+#include <termpp/commands.hpp>
+#include <termpp/control.hpp>
 #include <iostream>
-#include <term.hpp>
+#include <termpp/term.hpp>
 
 constexpr int func(int a)
 {
@@ -19,25 +19,27 @@ void print(T && t)
     std::cout << __PRETTY_FUNCTION__ << '\n';
 }
 
-auto prepare()
-{
-    auto l = [](int a) { return std::string{"a: "} + std::to_string(a); };
-    return term::commands(  //
-        term::cmd("cmd", h) //
-        ,
-        term::cmd("asd", l) //
-    );
-}
 
 int main()
 {
-    std::string cmd{"cmd 3 str"};
-    std::string asd{"asd 3 str"};
+    std::array<std::string, 2> commands = {
+        "cmd 3 str"
+        , "asd 3 str"
+    };
 
-    auto c = prepare();
+    constexpr auto l = [](int a) { return std::string{"a: "} + std::to_string(a); };
 
-    std::cout << c.call(cmd) << '\n';
-    std::cout << c.call(asd) << '\n';
+    constexpr auto c = term::commands(term::cmd("cmd", h) , term::cmd("asd", l));
+
+    for (const auto &cmd : commands)
+    {
+        std::cout << ":: call ::\n";
+        auto result = c.call(cmd);
+        if (result != "")
+        {
+            std::cout << result << '\n';
+        }
+    }
 
     // print(c);
 

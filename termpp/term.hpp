@@ -1,5 +1,5 @@
 #pragma once
-#include <make_array.hpp>
+#include <termpp/utils/make_array.hpp>
 
 #ifdef _WIN32 /* Windows platform, either MinGW or Visual Studio (MSVC) */
 #include <windows.h>
