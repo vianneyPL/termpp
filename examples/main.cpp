@@ -8,9 +8,9 @@ constexpr int func(int a)
     return 2 * a;
 }
 
-void h(int a, std::string b)
+std::string h(int a, std::string b)
 {
-    std::cout << "a: " << a << " - b: " << b << '\n';
+    return std::string{"a: "} + std::to_string(a) + std::string{" - b: "} + b;
 }
 
 template <typename T>
@@ -21,7 +21,7 @@ void print(T && t)
 
 auto prepare()
 {
-    auto l = [](int a) { std::cout << "a: " << a << '\n'; };
+    auto l = [](int a) { return std::string{"a: "} + std::to_string(a); };
     return term::commands(  //
         term::cmd("cmd", h) //
         ,
@@ -36,8 +36,8 @@ int main()
 
     auto c = prepare();
 
-    c.call(cmd);
-    c.call(asd);
+    std::cout << c.call(cmd) << '\n';
+    std::cout << c.call(asd) << '\n';
 
     // print(c);
 

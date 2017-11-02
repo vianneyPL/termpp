@@ -30,29 +30,28 @@ public:
         : _cmd(std::string_view{name, internal::length(name)}, f)
     {}
 
-    bool parser(std::vector<std::string> tokens)
+    std::tuple<std::string, bool> parser(std::vector<std::string> tokens)
     {
         if ((cmd_size != (tokens.size() - 1)) || (_cmd.first != tokens[0]))
         {
-            return false;
+            return std::make_tuple(std::string(""), false);
         }
-        parser_impl(tokens);
-        return true;
+        return std::make_tuple(parser_impl(tokens), true);
     }
 
 private:
     cmd_type _cmd;
 
     template <typename Indices = std::make_index_sequence<cmd_size>>
-    void parser_impl(const std::vector<std::string> & tokens)
+    std::string parser_impl(const std::vector<std::string> & tokens)
     {
-        parser_impl_at_index(tokens, Indices{});
+        return parser_impl_at_index(tokens, Indices{});
     }
 
     template <std::size_t... I>
-    void parser_impl_at_index(const std::vector<std::string> & tokens, std::index_sequence<I...>)
+    std::string parser_impl_at_index(const std::vector<std::string> & tokens, std::index_sequence<I...>)
     {
-        std::invoke(*_cmd.second, parser_impl_at_index_impl<I>(tokens)...);
+        return std::invoke(*_cmd.second, parser_impl_at_index_impl<I>(tokens)...);
     }
 
     template <std::size_t I>
@@ -77,32 +76,39 @@ public:
         // function>.");
     }
 
-    void call(std::string cmd_line)
+    std::string call(std::string cmd_line)
     {
         std::cout << ":: call ::\n";
         const auto tokens = internal::split(cmd_line, ' ');
         assert(tokens.size() > 0);
-        call_impl(tokens, std::make_index_sequence<commands_size>{});
+        return call_impl(tokens, std::make_index_sequence<commands_size>{});
     }
 
 private:
     commands_type _cmds;
 
     template <std::size_t... I>
-    void call_impl(const std::vector<std::string> & tokens, std::index_sequence<I...>)
+    auto call_impl(const std::vector<std::string> & tokens, std::index_sequence<I...>)
     {
-        bool result = (call_impl_at_index<I>(tokens) | ...);
-        if (result == false)
+        std::string result;
+        bool success = (call_impl_at_index<I>(tokens, result) | ...);
+        if (!success)
         {
             std::cerr << "No appropriate parser was found." << '\n';
         }
+        return result;
     }
 
     template <std::size_t I>
-    bool call_impl_at_index(const std::vector<std::string> & tokens)
+    bool call_impl_at_index(const std::vector<std::string> & tokens, std::string &result)
     {
         auto e = std::get<I>(_cmds);
-        return e.parser(tokens);
+        auto [r, success] = e.parser(tokens);
+        if (success)
+        {
+            result = r;
+        }
+        return success;
     }
 };
 }
