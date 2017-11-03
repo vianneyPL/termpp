@@ -3,11 +3,6 @@
 #include <iostream>
 #include <termpp/term.hpp>
 
-constexpr int func(int a)
-{
-    return 2 * a;
-}
-
 std::string h(int a, std::string b)
 {
     return std::string{"a: "} + std::to_string(a) + std::string{" - b: "} + b;
