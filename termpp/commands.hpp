@@ -61,14 +61,7 @@ private:
     template <std::size_t... I>
     std::string parser_impl_at_index(const std::vector<std::string> & tokens, std::index_sequence<I...>) const
     {
-        return std::invoke(*_cmd.second, parser_impl_at_index_impl<I>(tokens)...);
-    }
-
-    template <std::size_t I>
-    auto parser_impl_at_index_impl(const std::vector<std::string> & tokens) const
-    {
-        using arg_type = internal::function_arg_t<I, F>;
-        return parse<arg_type>(tokens.at(I + 1));
+        return std::invoke(*_cmd.second, parse<internal::function_arg_t<I, F>>(tokens.at(I+1))...);
     }
 };
 
