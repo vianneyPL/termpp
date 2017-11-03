@@ -5,6 +5,8 @@ add_library(termpp
     control.hpp
     commands.hpp
     parse.hpp
+    errors.hpp
+    errors.cpp
 )
 
 add_subdirectory(utils)

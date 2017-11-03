@@ -1,9 +1,9 @@
 #include <termpp/commands.hpp>
 #include <termpp/control.hpp>
-#include <iostream>
 #include <termpp/term.hpp>
+#include <iostream>
 
-std::string h(int a, std::string b)
+std::string h(long a, std::string b)
 {
     return std::string{"a: "} + std::to_string(a) + std::string{" - b: "} + b;
 }
@@ -14,25 +14,25 @@ void print(T && t)
     std::cout << __PRETTY_FUNCTION__ << '\n';
 }
 
-
 int main()
 {
-    std::array<std::string, 2> commands = {
-        "cmd 3 str"
-        , "asd 3 str"
-    };
+    std::array<std::string, 2> commands = {"cmd 3 str", "asd 3 str"};
 
     constexpr auto l = [](int a) { return std::string{"a: "} + std::to_string(a); };
 
-    constexpr auto c = term::commands(term::cmd("cmd", h) , term::cmd("asd", l));
+    constexpr auto c = term::commands(term::cmd("cmd", h), term::cmd("asd", l));
 
-    for (const auto &cmd : commands)
+    for (const auto & cmd : commands)
     {
         std::cout << ":: call ::\n";
-        auto result = c.call(cmd);
-        if (result != "")
+        auto[result, error] = c.call(cmd);
+        if (!error)
         {
             std::cout << result << '\n';
+        }
+        else
+        {
+            std::cerr << error << " - " << error.message() << '\n';
         }
     }
 

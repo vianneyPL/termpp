@@ -44,11 +44,9 @@ IndentWidth: 4
 # KeepEmptyLinesAtTheStartOfBlocks: true
 
 IncludeCategories:
-  - Regex:      '^(<|")api/'
+  - Regex:      '^(<|")termpp/'
     Priority:   3
-  - Regex:      '^(<|")apps/'
-    Priority:   3
-  - Regex:      '^(<|")qdb/'
+  - Regex:      '^(<|")examples/'
     Priority:   3
   - Regex:      '^(<|")tests/'
     Priority:   3
