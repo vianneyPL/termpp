@@ -1,7 +1,7 @@
 #include <termpp/errors.hpp>
 #include <string>
 
-namespace term
+namespace termpp
 {
 namespace
 {

@@ -15,7 +15,7 @@
 #include <tuple>
 #include <type_traits>
 
-namespace term
+namespace termpp
 {
 template <typename F>
 class cmd
@@ -71,7 +71,7 @@ private:
     template <std::size_t... I>
     std::string parser_impl_at_index(const std::vector<std::string> & tokens, std::index_sequence<I...>) const
     {
-        return std::invoke(*_cmd.second, parse<internal::function_arg_t<I, F>>(tokens.at(I + 1))...);
+        return std::invoke(*_cmd.second, arg_impl<internal::function_arg_t<I, F>>::parse(tokens.at(I + 1))...);
     }
 };
 
@@ -81,7 +81,7 @@ class commands
     using commands_type                        = std::tuple<Args...>;
     static constexpr std::size_t commands_size = sizeof...(Args);
 
-    static_assert((internal::is_cmd_v<Args> && ...), "initializer type should be a term::cmd.");
+    static_assert((internal::is_cmd_v<Args> && ...), "initializer type should be a termpp::cmd.");
 
 public:
     constexpr commands(Args... args)

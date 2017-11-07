@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace term
+namespace termpp
 {
     template <typename F>
     struct cmd;

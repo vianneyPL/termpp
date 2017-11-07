@@ -2,7 +2,7 @@
 
 #include <system_error>
 
-namespace term
+namespace termpp
 {
 enum class cmd_errc
 {
@@ -19,7 +19,7 @@ std::error_code make_error_code(cmd_errc);
 namespace std
 {
 template <>
-struct is_error_code_enum<term::cmd_errc> : true_type
+struct is_error_code_enum<termpp::cmd_errc> : true_type
 {
 };
 }

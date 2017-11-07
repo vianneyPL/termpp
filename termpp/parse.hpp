@@ -1,63 +1,153 @@
 #pragma once
 
 #include <string>
+#include <type_traits>
 
-namespace term
+namespace termpp
 {
 template <typename T>
-T parse(const std::string &arg);
+struct arg;
+
+template <typename T, typename U = std::remove_const_t<std::remove_reference_t<T>>, typename Arg = arg<U>>
+struct arg_impl
+{
+    static U parse(const std::string & value)
+    {
+        return Arg::parse(value);
+    }
+    static const char * signature() noexcept
+    {
+        return Arg::signature();
+    }
+};
 
 template <>
-int parse<int>(const std::string &arg)
+struct arg<int>
 {
-    return std::stoi(arg);
-}
+    static auto parse(const std::string & arg)
+    {
+        return std::stoi(arg);
+    }
+    static const char * signature() noexcept
+    {
+        return "int";
+    }
+};
 
 template <>
-long parse<long>(const std::string &arg)
+struct arg<long>
 {
-    return std::stol(arg);
-}
+    static long parse(const std::string & arg)
+    {
+        return std::stol(arg);
+    }
+    static const char * signature() noexcept
+    {
+        return "long int";
+    }
+};
 
 template <>
-long long parse<long long>(const std::string &arg)
+struct arg<long long>
 {
-    return std::stoll(arg);
-}
+    static auto parse(const std::string & arg)
+    {
+        return std::stoll(arg);
+    }
+    static const char * signature() noexcept
+    {
+        return "long long int";
+    }
+};
 
 template <>
-unsigned long parse<unsigned long>(const std::string &arg)
+struct arg<unsigned long>
 {
-    return std::stoul(arg);
-}
+    static auto parse(const std::string & arg)
+    {
+        return std::stoul(arg);
+    }
+    static const char * signature() noexcept
+    {
+        return "unsigned long int";
+    }
+};
 
 template <>
-unsigned long long parse<unsigned long long>(const std::string &arg)
+struct arg<unsigned long long>
 {
-    return std::stoull(arg);
-}
+    static auto parse(const std::string & arg)
+    {
+        return std::stoull(arg);
+    }
+    static const char * signature() noexcept
+    {
+        return "unsigned long long int";
+    }
+};
 
 template <>
-float parse<float>(const std::string &arg)
+struct arg<float>
 {
-    return std::stof(arg);
-}
+    static auto parse(const std::string & arg)
+    {
+        return std::stof(arg);
+    }
+    static const char * signature() noexcept
+    {
+        return "float";
+    }
+};
 
 template <>
-double parse<double>(const std::string &arg)
+struct arg<double>
 {
-    return std::stod(arg);
-}
+    static auto parse(const std::string & arg)
+    {
+        return std::stod(arg);
+    }
+    static const char * signature() noexcept
+    {
+        return "double";
+    }
+};
 
 template <>
-long double parse<long double>(const std::string &arg)
+struct arg<long double>
 {
-    return std::stold(arg);
-}
+    static long double parse(const std::string & arg)
+    {
+        return std::stold(arg);
+    }
+    static const char * signature() noexcept
+    {
+        return "long double";
+    }
+};
 
 template <>
-std::string parse<std::string>(const std::string &arg)
+struct arg<std::string>
 {
-    return arg;
-}
+    static auto parse(const std::string & arg)
+    {
+        return std::string{arg};
+    }
+    static const char * signature() noexcept
+    {
+        return "std::string";
+    }
+};
+
+template <>
+struct arg<char *>
+{
+    static auto parse(const std::string & arg)
+    {
+        return arg.c_str();
+    }
+    static const char * signature() noexcept
+    {
+        return "char *";
+    }
+};
 }

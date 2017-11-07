@@ -2,7 +2,7 @@
 
 #include <string_view>
 
-namespace term
+namespace termpp
 {
 template <typename F>
 class control

@@ -1,7 +1,7 @@
 #include "term.hpp"
 #include <iostream>
 
-namespace term
+namespace termpp
 {
 #ifndef _WIN32
 #include <sys/ioctl.h>

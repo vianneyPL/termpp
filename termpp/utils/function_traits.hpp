@@ -3,7 +3,7 @@
 #include <tuple>
 #include <type_traits>
 
-namespace term
+namespace termpp
 {
 namespace internal
 {
