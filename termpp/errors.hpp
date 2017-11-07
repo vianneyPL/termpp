@@ -2,7 +2,7 @@
 
 #include <system_error>
 
-namespace termpp
+namespace trm
 {
 enum class cmd_errc
 {
@@ -10,6 +10,7 @@ enum class cmd_errc
     not_enough_arguments,
     too_much_arguments,
     wrong_command,
+    unknown_command,
     no_parser_found
 };
 
@@ -19,7 +20,7 @@ std::error_code make_error_code(cmd_errc);
 namespace std
 {
 template <>
-struct is_error_code_enum<termpp::cmd_errc> : true_type
+struct is_error_code_enum<trm::cmd_errc> : true_type
 {
 };
 }

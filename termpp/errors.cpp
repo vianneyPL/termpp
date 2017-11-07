@@ -1,7 +1,7 @@
 #include <termpp/errors.hpp>
 #include <string>
 
-namespace termpp
+namespace trm
 {
 namespace
 {
@@ -26,6 +26,8 @@ std::string cmd_err_category::message(int ev) const
         return "too much arguments";
     case cmd_errc::wrong_command:
         return "wrong command";
+    case cmd_errc::unknown_command:
+        return "unknown command";
     case cmd_errc::no_parser_found:
         return "no parser found";
     default:

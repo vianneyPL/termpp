@@ -1,6 +1,6 @@
 #pragma once
 
-namespace termpp
+namespace trm
 {
 namespace internal
 {

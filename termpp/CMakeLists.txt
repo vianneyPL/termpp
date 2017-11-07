@@ -1,10 +1,11 @@
-include_directories(${CMAKE_SOURCE_DIR}/thirdparty/brigand/include)
+include_directories(${CMAKE_SOURCE_DIR}/thirdparty/brigand/include/standalone)
 
 add_library(termpp
     STATIC
     term.cpp
     term.hpp
     cmd.hpp
+    cmd_factory.hpp
     commands.hpp
     parse.hpp
     errors.hpp

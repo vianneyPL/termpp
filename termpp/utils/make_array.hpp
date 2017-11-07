@@ -2,7 +2,7 @@
 
 #include <array>
 
-namespace termpp
+namespace trm
 {
 namespace internal
 {

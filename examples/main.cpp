@@ -19,7 +19,7 @@ int main()
 
     constexpr auto l = [](int a) { return std::string{"a: "} + std::to_string(a); };
 
-    constexpr auto c = termpp::commands(termpp::cmd("cmd", h), termpp::cmd("asd", l));
+    auto c = trm::commands(trm::cmd("cmd", h));
 
     for (const auto & cmd : commands)
     {
@@ -37,21 +37,21 @@ int main()
 
     // print(c);
 
-    // auto c = termpp::commands(
-    //     termpp::cmd("cmd", h)
-    //     // , termpp::cmd("cmd2", [](int a) { std::cout  << "a: " << a << '\n'; })
+    // auto c = trm::commands(
+    //     trm::cmd("cmd", h)
+    //     // , trm::cmd("cmd2", [](int a) { std::cout  << "a: " << a << '\n'; })
     // );
     // print(c);
 
-    // auto c = termpp::make_commands();
+    // auto c = trm::make_commands();
 
     // caller(command);
 
     // constexpr auto l = [](int a) { return 2 * a; };
-    // constexpr termpp::control ctrl{std::string_view{"asd", 3}, func};
+    // constexpr trm::control ctrl{std::string_view{"asd", 3}, func};
     // constexpr int a = ctrl.call(2);
     // std::cout << ctrl.call(2) << '\n';
 
-    // termpp::term t{};
+    // trm::term t{};
     // t.run();
 }

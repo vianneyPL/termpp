@@ -3,7 +3,7 @@
 #include <string>
 #include <type_traits>
 
-namespace termpp
+namespace trm
 {
 template <typename T>
 struct arg;

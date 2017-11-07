@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace termpp
+namespace trm
 {
 namespace internal
 {

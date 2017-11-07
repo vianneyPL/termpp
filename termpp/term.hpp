@@ -10,7 +10,7 @@
 
 #include <string>
 
-namespace termpp
+namespace trm
 {
 enum class ctrl
 {

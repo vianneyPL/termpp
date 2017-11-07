@@ -10,7 +10,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace termpp
+namespace trm
 {
 template <typename F>
 class cmd
@@ -71,4 +71,4 @@ private:
         return std::invoke(*_cmd.second, arg_impl<internal::function_arg_t<I, F>>::parse(tokens.at(I + 1))...);
     }
 };
-} // namespace termpp
+} // namespace trm
