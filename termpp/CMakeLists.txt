@@ -1,8 +1,9 @@
+include_directories(${CMAKE_SOURCE_DIR}/thirdparty/brigand/include)
+
 add_library(termpp
     STATIC
     term.cpp
     term.hpp
-    control.hpp
     commands.hpp
     parse.hpp
     errors.hpp

@@ -1,5 +1,4 @@
 #include <termpp/commands.hpp>
-#include <termpp/control.hpp>
 #include <termpp/term.hpp>
 #include <iostream>
 
