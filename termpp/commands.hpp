@@ -20,10 +20,12 @@ namespace termpp
 template <typename F>
 class cmd
 {
-    using cmd_type                        = std::pair<std::string_view, F>;
-    static constexpr std::size_t cmd_size = internal::function_arg_count_v<F>;
-    static_assert(std::is_convertible_v<internal::function_ret_t<F>, std::string>, "return type must be convertible to std::string.");
-    // static_assert(std::is_function_v<std::remove_pointer_t<F>>, "second argument must be a function.");
+    using cmd_type = std::pair<std::string_view, F>;
+
+    static constexpr std::size_t cmd_size  = internal::function_arg_count_v<F>;
+    static constexpr bool is_ret_allowed_v = std::is_convertible_v<internal::function_ret_t<F>, std::string>;
+
+    static_assert(is_ret_allowed_v, "return type must be convertible to std::string.");
 
 public:
     constexpr cmd(std::string_view name, F f)
@@ -81,7 +83,7 @@ class commands
     using commands_type                        = std::tuple<Args...>;
     static constexpr std::size_t commands_size = sizeof...(Args);
 
-    static_assert((internal::is_cmd_v<Args> && ...), "initializer type should be a termpp::cmd.");
+    static_assert((internal::is_cmd_v<Args> && ...), "initializer types should be termpp::cmd.");
 
 public:
     constexpr commands(Args... args)
