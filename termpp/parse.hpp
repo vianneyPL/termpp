@@ -15,7 +15,7 @@ struct arg_impl
     {
         return Arg::parse(value);
     }
-    static const char * signature() noexcept
+    static std::string signature() noexcept
     {
         return Arg::signature();
     }
