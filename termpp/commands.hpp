@@ -14,16 +14,16 @@
 namespace trm
 {
 
-struct parser_visitor
+struct call_visitor
 {
-    parser_visitor(std::vector<std::string> tokens)
+    call_visitor(std::vector<std::string> tokens)
         : _tokens{tokens}
     {}
 
     template <typename Command>
     auto operator()(const Command & cmd)
     {
-        return cmd.parser(_tokens);
+        return cmd.call(_tokens);
     }
 
 private:
@@ -64,7 +64,7 @@ public:
         try
         {
             const auto & cmd = _cmd_factory.get(tokens[0]);
-            return std::visit(parser_visitor(tokens), cmd);
+            return std::visit(call_visitor(tokens), cmd);
         }
         catch (const std::runtime_error & /*unused*/)
         {
