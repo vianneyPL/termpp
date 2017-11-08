@@ -52,7 +52,7 @@ public:
             const auto & cmd = _cmd_factory.get(tokens[0]);
             result           = std::visit(command_visitor(tokens), cmd);
         }
-        catch (const std::runtime_error & e)
+        catch (const std::runtime_error & /*unused*/)
         {
             result = std::make_tuple(std::string{}, make_error_code(cmd_errc::unknown_command));
         }
