@@ -2,7 +2,7 @@
 
 #define BRIGAND_NO_BOOST_SUPPORT
 
-#include "/home/vianney/_git/vianneyPL/termpp/thirdparty/brigand/include/standalone/brigand.hpp"
+#include <brigand.hpp>
 #include <exception>
 #include <map>
 #include <string>
