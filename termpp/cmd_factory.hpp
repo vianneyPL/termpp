@@ -33,7 +33,19 @@ class cmd_factory
 {
     using list_commands = brigand::list<Args...>;
     using any_command   = brigand::as_variant<list_commands>;
+public:
+    cmd_factory(Args... args)
+    {
+        initialize(std::make_tuple(args...), std::make_index_sequence<sizeof...(Args)>{});
+    }
 
+    const any_command & get(const std::string & command_name) const
+    {
+        if (!_constructors.count(command_name)) throw unknown_command{};
+        return _constructors.at(command_name);
+    }
+
+private:
     std::map<std::string, any_command> _constructors;
 
     template <std::size_t... I>
@@ -49,16 +61,5 @@ class cmd_factory
         _constructors.insert(std::pair(cmd.name(), cmd));
     }
 
-public:
-    cmd_factory(Args... args)
-    {
-        initialize(std::make_tuple(args...), std::make_index_sequence<sizeof...(Args)>{});
-    }
-
-    const any_command & get(const std::string & command_name) const
-    {
-        if (!_constructors.count(command_name)) throw unknown_command{};
-        return _constructors.at(command_name);
-    }
 };
 }
