@@ -15,11 +15,11 @@ void print(T && t)
 
 int main()
 {
-    std::array<std::string, 2> commands = {"cmd 3 str", "asd 3 str"};
+    const auto commands = trm::internal::make_array("cmd 3 str", "asd 3", "bla 3");
 
-    constexpr auto l = [](int a) { return std::string{"a: "} + std::to_string(a); };
+    constexpr auto l = [](int a) { return std::to_string(a).c_str(); };
 
-    auto c = trm::commands(trm::cmd("cmd", h));
+    auto c = trm::commands(trm::cmd("cmd", h), trm::cmd("asd", l));
 
     for (const auto & cmd : commands)
     {
@@ -35,23 +35,24 @@ int main()
         }
     }
 
-    // print(c);
-
-    // auto c = trm::commands(
-    //     trm::cmd("cmd", h)
-    //     // , trm::cmd("cmd2", [](int a) { std::cout  << "a: " << a << '\n'; })
-    // );
-    // print(c);
-
-    // auto c = trm::make_commands();
-
-    // caller(command);
-
-    // constexpr auto l = [](int a) { return 2 * a; };
-    // constexpr trm::control ctrl{std::string_view{"asd", 3}, func};
-    // constexpr int a = ctrl.call(2);
-    // std::cout << ctrl.call(2) << '\n';
-
+    for (const auto & cmd : commands)
+    {
+        const auto tokens = trm::internal::split(cmd, ' ');
+        auto [signature, error] = c.signature(tokens[0]);
+        if (!error)
+        {
+            std::cout << ":: signature ::\n\t";
+            for (const auto & arg : signature)
+            {
+                std::cout << " - " << arg;
+            }
+            std::cout << " - \n";
+        }
+        else
+        {
+            std::cerr << error << " - " << error.message() << '\n';
+        }
+    }
     // trm::term t{};
     // t.run();
 }

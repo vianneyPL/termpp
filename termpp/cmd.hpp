@@ -4,6 +4,7 @@
 #include <termpp/parse.hpp>
 #include <termpp/utils/function_traits.hpp>
 #include <termpp/utils/length.hpp>
+#include <termpp/utils/make_array.hpp>
 #include <functional>
 #include <string>
 #include <string_view>
@@ -23,41 +24,43 @@ class cmd
     static_assert(is_ret_allowed_v, "return type must be convertible to std::string.");
 
 public:
-    constexpr cmd(std::string_view name, F f)
-        : cmd_name(name.data())
-        , _cmd(name, f)
-    {}
     constexpr cmd(const char * name, F f)
-        : cmd_name(name)
+        : _name(name)
         , _cmd(std::string_view{name, internal::length(name)}, f)
+        , _signature(initialize_signature(std::make_index_sequence<cmd_size>{}))
     {}
 
     auto parser(std::vector<std::string> tokens) const
     {
         if (_cmd.first != tokens[0])
         {
-            return std::make_tuple(std::string{}, make_error_code(cmd_errc::wrong_command));
+            return std::tuple{std::string{}, make_error_code(cmd_errc::wrong_command)};
         }
         else if (cmd_size > (tokens.size() - 1))
         {
-            return std::make_tuple(std::string{}, make_error_code(cmd_errc::not_enough_arguments));
+            return std::tuple{std::string{}, make_error_code(cmd_errc::not_enough_arguments)};
         }
         else if (cmd_size < (tokens.size() - 1))
         {
-            return std::make_tuple(std::string{}, make_error_code(cmd_errc::too_much_arguments));
+            return std::tuple{std::string{}, make_error_code(cmd_errc::too_much_arguments)};
         }
-        return std::make_tuple(parser_impl(tokens), std::error_code{});
+        return std::tuple{parser_impl(tokens), std::error_code{}};
     }
 
     constexpr const char * name() const noexcept
     {
-        return _cmd.first.data();
+        return _name;
     }
 
-    const char * cmd_name;
+    const std::vector<std::string> &signature() const
+    {
+        return _signature;
+    }
 
 private:
     cmd_type _cmd;
+    const char * _name;
+    const std::vector<std::string> _signature;
 
     template <typename Indices = std::make_index_sequence<cmd_size>>
     std::string parser_impl(const std::vector<std::string> & tokens) const
@@ -69,6 +72,12 @@ private:
     std::string parser_impl_at_index(const std::vector<std::string> & tokens, std::index_sequence<I...>) const
     {
         return std::invoke(*_cmd.second, arg_impl<internal::function_arg_t<I, F>>::parse(tokens.at(I + 1))...);
+    }
+
+    template <std::size_t... I>
+    auto initialize_signature(std::index_sequence<I...>) const
+    {
+        return std::vector<std::string>{arg_impl<internal::function_arg_t<I, F>>::signature()...};
     }
 };
 } // namespace trm
