@@ -30,6 +30,8 @@ std::string cmd_err_category::message(int ev) const
         return "unknown command";
     case cmd_errc::no_parser_found:
         return "no parser found";
+    case cmd_errc::parse_error:
+        return "parse error";
     default:
         return "(unrecognized error)";
     }

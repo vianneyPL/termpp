@@ -31,23 +31,6 @@ public:
         , _signature(initialize_signature(Indices{}))
     {}
 
-    auto call(std::vector<std::string> tokens) const
-    {
-        if (_cmd.first != tokens[0])
-        {
-            return std::tuple{std::string{}, make_error_code(cmd_errc::wrong_command)};
-        }
-        else if (cmd_size > (tokens.size() - 1))
-        {
-            return std::tuple{std::string{}, make_error_code(cmd_errc::not_enough_arguments)};
-        }
-        else if (cmd_size < (tokens.size() - 1))
-        {
-            return std::tuple{std::string{}, make_error_code(cmd_errc::too_much_arguments)};
-        }
-        return std::tuple{call_impl(tokens, Indices{}), std::error_code{}};
-    }
-
     constexpr const char * name() const noexcept
     {
         return _name;
@@ -58,21 +41,58 @@ public:
         return _signature;
     }
 
+    auto call(const std::vector<std::string> & tokens) const
+    {
+        if (auto err = call_check(tokens); err)
+        {
+            return std::tuple{std::string{}, err};
+        }
+        return call_impl(tokens, Indices{});
+    }
+
 private:
     cmd_type _cmd;
     const char * _name;
     const std::vector<std::string> _signature;
 
     template <std::size_t... I>
-    std::string call_impl(const std::vector<std::string> & tokens, std::index_sequence<I...>) const
-    {
-        return std::invoke(*_cmd.second, arg_impl<internal::function_arg_t<I, F>>::parse(tokens.at(I + 1))...);
-    }
-
-    template <std::size_t... I>
     auto initialize_signature(std::index_sequence<I...>) const
     {
         return std::vector<std::string>{arg_impl<internal::function_arg_t<I, F>>::signature()...};
+    }
+
+    std::error_code call_check(const std::vector<std::string> & tokens) const
+    {
+        if (_cmd.first != tokens[0])
+        {
+            return make_error_code(cmd_errc::wrong_command);
+        }
+        else if (cmd_size > (tokens.size() - 1))
+        {
+            return make_error_code(cmd_errc::not_enough_arguments);
+        }
+        else if (cmd_size < (tokens.size() - 1))
+        {
+            return make_error_code(cmd_errc::too_much_arguments);
+        }
+        return {};
+    }
+
+    template <std::size_t... I>
+    std::tuple<std::string, std::error_code> call_impl(const std::vector<std::string> & tokens, std::index_sequence<I...>) const
+    {
+        auto args = std::make_tuple(arg_impl<internal::function_arg_t<I, F>>::parse(tokens.at(I + 1))...);
+        if (!check_parse_error(args, Indices{}))
+        {
+            return std::tuple{std::string{}, make_error_code(cmd_errc::parse_error)};
+        }
+        return std::tuple{std::invoke(*_cmd.second, std::get<0>(std::get<I>(args))...), std::error_code{}};
+    }
+
+    template <typename T, std::size_t... I>
+    bool check_parse_error(T && t, std::index_sequence<I...>) const
+    {
+        return (!std::get<1>(std::get<I>(t)) && ...);
     }
 };
 } // namespace trm

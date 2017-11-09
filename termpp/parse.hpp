@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <system_error>
+#include <tuple>
 #include <type_traits>
 
 namespace trm
@@ -11,7 +13,7 @@ struct arg;
 template <typename T, typename U = std::remove_const_t<std::remove_reference_t<T>>, typename Arg = arg<U>>
 struct arg_impl
 {
-    static U parse(const std::string & value)
+    static std::tuple<U, std::error_code> parse(const std::string & value)
     {
         return Arg::parse(value);
     }
@@ -26,7 +28,7 @@ struct arg<int>
 {
     static auto parse(const std::string & arg)
     {
-        return std::stoi(arg);
+        return std::tuple{std::stoi(arg), std::error_code{}};
     }
     static const char * signature() noexcept
     {
@@ -37,9 +39,9 @@ struct arg<int>
 template <>
 struct arg<long>
 {
-    static long parse(const std::string & arg)
+    static auto parse(const std::string & arg)
     {
-        return std::stol(arg);
+        return std::tuple{std::stol(arg), std::error_code{}};
     }
     static const char * signature() noexcept
     {
@@ -52,7 +54,7 @@ struct arg<long long>
 {
     static auto parse(const std::string & arg)
     {
-        return std::stoll(arg);
+        return std::tuple{std::stoll(arg), std::error_code{}};
     }
     static const char * signature() noexcept
     {
@@ -65,7 +67,7 @@ struct arg<unsigned long>
 {
     static auto parse(const std::string & arg)
     {
-        return std::stoul(arg);
+        return std::tuple{std::stoul(arg), std::error_code{}};
     }
     static const char * signature() noexcept
     {
@@ -78,7 +80,7 @@ struct arg<unsigned long long>
 {
     static auto parse(const std::string & arg)
     {
-        return std::stoull(arg);
+        return std::tuple{std::stoull(arg), std::error_code{}};
     }
     static const char * signature() noexcept
     {
@@ -91,7 +93,7 @@ struct arg<float>
 {
     static auto parse(const std::string & arg)
     {
-        return std::stof(arg);
+        return std::tuple{std::stof(arg), std::error_code{}};
     }
     static const char * signature() noexcept
     {
@@ -104,7 +106,7 @@ struct arg<double>
 {
     static auto parse(const std::string & arg)
     {
-        return std::stod(arg);
+        return std::tuple{std::stod(arg), std::error_code{}};
     }
     static const char * signature() noexcept
     {
@@ -115,9 +117,9 @@ struct arg<double>
 template <>
 struct arg<long double>
 {
-    static long double parse(const std::string & arg)
+    static auto parse(const std::string & arg)
     {
-        return std::stold(arg);
+        return std::tuple{std::stold(arg), std::error_code{}};
     }
     static const char * signature() noexcept
     {
@@ -130,7 +132,7 @@ struct arg<std::string>
 {
     static auto parse(const std::string & arg)
     {
-        return std::string{arg};
+        return std::tuple{std::string{arg}, std::error_code{}};
     }
     static const char * signature() noexcept
     {
@@ -143,7 +145,7 @@ struct arg<char *>
 {
     static auto parse(const std::string & arg)
     {
-        return arg.c_str();
+        return std::tuple{arg.c_str(), std::error_code{}};
     }
     static const char * signature() noexcept
     {

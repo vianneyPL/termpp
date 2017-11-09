@@ -11,7 +11,8 @@ enum class cmd_errc
     too_much_arguments,
     wrong_command,
     unknown_command,
-    no_parser_found
+    no_parser_found,
+    parse_error
 };
 
 std::error_code make_error_code(cmd_errc);
