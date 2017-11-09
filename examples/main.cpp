@@ -23,25 +23,27 @@ int main()
 
     for (const auto & cmd : commands)
     {
-        std::cout << ":: call ::\n";
+        std::cout << "call "
+                  << "[" << cmd << "] -> ";
         auto[result, error] = c.call(cmd);
         if (!error)
         {
-            std::cout << result << '\n';
+            std::cout << "result: " << result << '\n';
         }
         else
         {
-            std::cerr << error << " - " << error.message() << '\n';
+            std::cerr << "error: " << error << " - " << error.message() << '\n';
         }
     }
 
     for (const auto & cmd : commands)
     {
-        const auto tokens = trm::internal::split(cmd, ' ');
-        auto [signature, error] = c.signature(tokens[0]);
+        std::cout << "signature "
+                  << "[" << cmd << "] -> ";
+        const auto tokens      = trm::internal::split(cmd, ' ');
+        auto[signature, error] = c.signature(tokens[0]);
         if (!error)
         {
-            std::cout << ":: signature ::\n\t";
             for (const auto & arg : signature)
             {
                 std::cout << " - " << arg;
@@ -50,7 +52,7 @@ int main()
         }
         else
         {
-            std::cerr << error << " - " << error.message() << '\n';
+            std::cerr << "error: " << error << " - " << error.message() << '\n';
         }
     }
     // trm::term t{};
