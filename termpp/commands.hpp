@@ -14,33 +14,6 @@
 namespace trm
 {
 
-struct call_visitor
-{
-    call_visitor(std::vector<std::string> tokens)
-        : _tokens{tokens}
-    {}
-
-    template <typename Command>
-    auto operator()(const Command & cmd)
-    {
-        return cmd.call(_tokens);
-    }
-
-private:
-    std::vector<std::string> _tokens;
-};
-
-struct signature_visitor
-{
-    signature_visitor()
-    {}
-    template <typename Command>
-    auto operator()(const Command & cmd) const
-    {
-        return cmd.signature();
-    }
-};
-
 template <typename... Args>
 class commands
 {
@@ -57,22 +30,16 @@ public:
     auto call(std::string cmd_line) const
     {
         const auto tokens = internal::split(cmd_line, ' ');
-        if (tokens.size() == 0)
+        if (auto err = call_check(tokens); err)
         {
-            return std::make_tuple(std::string{}, make_error_code(cmd_errc::empty_input));
+            return std::tuple{std::string{}, err};
         }
-        try
-        {
-            const auto & cmd = _cmd_factory.get(tokens[0]);
-            return std::visit(call_visitor(tokens), cmd);
-        }
-        catch (const std::runtime_error & /*unused*/)
-        {
-            return std::tuple{std::string{}, make_error_code(cmd_errc::unknown_command)};
-        }
+        const auto & command_name = tokens[0];
+        const auto & command      = _cmd_factory.get(command_name);
+        return std::visit([&tokens](const auto & cmd) { return cmd.call(tokens); }, command);
     }
 
-    const std::array<std::string, cmds_size> & names() const
+    const std::array<const std::string, cmds_size> & names() const
     {
         return _names;
     }
@@ -82,7 +49,7 @@ public:
         try
         {
             const auto & cmd = _cmd_factory.get(name);
-            return std::make_tuple(std::visit(signature_visitor(), cmd), std::error_code{});
+            return std::make_tuple(std::visit([](const auto & cmd) { return cmd.signature(); }, cmd), std::error_code{});
         }
         catch (const std::runtime_error & /*unused*/)
         {
@@ -91,20 +58,27 @@ public:
     }
 
 private:
-    cmd_factory<Args...> _cmd_factory;
+    const cmd_factory<Args...> _cmd_factory;
     const std::array<std::string, cmds_size> _names;
+
+    const std::error_code call_check(const std::vector<std::string> & tokens) const
+    {
+        if (tokens.size() == 0)
+        {
+            return make_error_code(cmd_errc::empty_input);
+        }
+        const auto & command_name = tokens[0];
+        if (!std::count(std::begin(_names), std::end(_names), command_name))
+        {
+            return make_error_code(cmd_errc::unknown_command);
+        }
+        return {};
+    }
 
     template <std::size_t... I>
     auto initialize_names(std::tuple<Args...> commands, std::index_sequence<I...>) const
     {
-        return internal::make_array(initialize_names_index<I>(commands)...);
-    }
-
-    template <std::size_t I>
-    std::string initialize_names_index(std::tuple<Args...> commands) const
-    {
-        const auto & cmd = std::get<I>(commands);
-        return std::string{cmd.name()};
+        return internal::make_array(std::string{std::get<I>(commands).name()}...);
     }
 };
 }
