@@ -27,7 +27,7 @@ public:
         , _names(initialize_names(std::make_tuple(args...), std::make_index_sequence<cmds_size>{}))
     {}
 
-    auto call(std::string cmd_line) const
+    const auto call(std::string cmd_line) const
     {
         const auto tokens = internal::split(cmd_line, ' ');
         if (auto err = call_check(tokens); err)
@@ -44,7 +44,7 @@ public:
         return _names;
     }
 
-    const auto signature(const std::string & name)
+    const std::tuple<std::vector<std::string>, std::error_code> signature(const std::string & name)
     {
         try
         {
@@ -76,7 +76,7 @@ private:
     }
 
     template <std::size_t... I>
-    auto initialize_names(std::tuple<Args...> commands, std::index_sequence<I...>) const
+    const std::array<std::string, cmds_size> initialize_names(std::tuple<Args...> commands, std::index_sequence<I...>) const
     {
         return internal::make_array(std::string{std::get<I>(commands).name()}...);
     }

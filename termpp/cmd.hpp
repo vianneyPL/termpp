@@ -41,7 +41,7 @@ public:
         return _signature;
     }
 
-    auto call(const std::vector<std::string> & tokens) const
+    const std::tuple<std::string, std::error_code> call(const std::vector<std::string> & tokens) const
     {
         if (auto err = call_check(tokens); err)
         {
@@ -56,12 +56,12 @@ private:
     const std::vector<std::string> _signature;
 
     template <std::size_t... I>
-    auto initialize_signature(std::index_sequence<I...>) const
+    const std::vector<std::string> initialize_signature(std::index_sequence<I...>) const
     {
         return std::vector<std::string>{arg_impl<internal::function_arg_t<I, F>>::signature()...};
     }
 
-    std::error_code call_check(const std::vector<std::string> & tokens) const
+    const std::error_code call_check(const std::vector<std::string> & tokens) const
     {
         if (_cmd.first != tokens[0])
         {
@@ -79,7 +79,7 @@ private:
     }
 
     template <std::size_t... I>
-    std::tuple<std::string, std::error_code> call_impl(const std::vector<std::string> & tokens, std::index_sequence<I...>) const
+    const std::tuple<std::string, std::error_code> call_impl(const std::vector<std::string> & tokens, std::index_sequence<I...>) const
     {
         auto args = std::make_tuple(arg_impl<internal::function_arg_t<I, F>>::parse(tokens.at(I + 1))...);
         if (!check_parse_error(args, Indices{}))
