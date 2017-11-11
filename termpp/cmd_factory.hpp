@@ -19,20 +19,12 @@ using as_variant = wrap<L, variant_wrapper>;
 
 namespace trm
 {
-
-class unknown_command : public std::runtime_error
-{
-public:
-    explicit unknown_command()
-        : std::runtime_error{"Unknown command"}
-    {}
-};
-
 template <typename... Args>
 class cmd_factory
 {
     using list_commands = brigand::list<Args...>;
     using any_command   = brigand::as_variant<list_commands>;
+
 public:
     cmd_factory(Args... args)
     {
@@ -41,7 +33,6 @@ public:
 
     const any_command & get(const std::string & command_name) const
     {
-        if (!_constructors.count(command_name)) throw unknown_command{};
         return _constructors.at(command_name);
     }
 
@@ -60,6 +51,5 @@ private:
         const auto & cmd = std::get<I>(commands);
         _constructors.insert(std::pair(cmd.name(), cmd));
     }
-
 };
 }
