@@ -49,11 +49,11 @@ public:
         try
         {
             const auto & cmd = _cmd_factory.get(name);
-            return std::make_tuple(std::visit([](const auto & cmd) { return cmd.signature(); }, cmd), std::error_code{});
+            return std::tuple{std::visit([](const auto & cmd) { return cmd.signature(); }, cmd), std::error_code{}};
         }
-        catch (const std::runtime_error & /*unused*/)
+        catch (const std::out_of_range & /*unused*/)
         {
-            return std::make_tuple(std::vector<std::string>{}, make_error_code(cmd_errc::unknown_command));
+            return std::tuple{std::vector<std::string>{}, make_error_code(cmd_errc::unknown_command)};
         }
     }
 
