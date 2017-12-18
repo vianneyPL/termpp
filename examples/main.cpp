@@ -2,7 +2,7 @@
 #include <termpp/term.hpp>
 #include <iostream>
 
-std::string h(long a, std::string b)
+std::string h(long & a, std::string b)
 {
     return std::string{"a: "} + std::to_string(a) + std::string{" - b: "} + b;
 }
@@ -15,17 +15,25 @@ void print(T && t)
 
 int main()
 {
+    trm::term t{};
+    t.run();
+    return 1;
     const auto commands = trm::internal::make_array("cmd 3 str", "asd 3", "bla 3");
 
     constexpr auto l = [](int a) { return std::to_string(a).c_str(); };
 
-    auto c = trm::commands(trm::cmd("cmd", h), trm::cmd("asd", l));
+    // clang-format off
+    auto c = trm::commands{
+        trm::cmd("cmd", h)
+        , trm::cmd("asd", l)
+    };
+    // clang-format on
 
     for (const auto & cmd : commands)
     {
         std::cout << "call "
                   << "[" << cmd << "] -> ";
-        auto[result, error] = c.call(cmd);
+        auto [result, error] = c.call(cmd);
         if (!error)
         {
             std::cout << "result: " << result << '\n';
@@ -40,8 +48,8 @@ int main()
     {
         std::cout << "signature "
                   << "[" << cmd << "] -> ";
-        const auto tokens      = trm::internal::split(cmd, ' ');
-        auto[signature, error] = c.signature(tokens[0]);
+        const auto tokens       = trm::internal::split(cmd, ' ');
+        auto [signature, error] = c.signature(tokens[0]);
         if (!error)
         {
             for (const auto & arg : signature)
@@ -55,6 +63,4 @@ int main()
             std::cerr << "error: " << error << " - " << error.message() << '\n';
         }
     }
-    // trm::term t{};
-    // t.run();
 }

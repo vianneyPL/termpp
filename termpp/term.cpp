@@ -1,4 +1,5 @@
 #include "term.hpp"
+#include "keys.hpp"
 #include <iostream>
 
 namespace trm
@@ -8,16 +9,70 @@ namespace trm
 #include <termios.h>
 #include <unistd.h>
 
+
+struct key_visitor
+{
+    key_visitor()
+    {}
+    template <typename Key>
+    std::string operator()(const Key & k)
+    {
+        if constexpr (std::is_same_v<Key, ctrl_c>)
+        {
+            return std::string{"ctrl: "} + std::to_string(static_cast<int>(k));
+        }
+        else if (std::is_same_v<Key, alt>)
+        {
+            return std::string{"alt: "} + std::to_string(static_cast<int>(k));
+        }
+        else if (std::is_same_v<Key, alt_maj>)
+        {
+            return std::string{"alt_maj: "} + std::to_string(static_cast<int>(k));
+        }
+        else if (std::is_same_v<Key, char>)
+        {
+            return std::string{"char: "} + std::string{static_cast<char>(k)};
+        }
+        return std::string{"none"};
+    }
+};
+
 void term::run() noexcept
 {
     while (true)
     {
-        char c;
+        std::array<char, 6> buf = {};
+        int ret                 = read(_fd, &buf, 6);
+        if (ret < 0)
         {
-            int ret = read(_fd, &c, 1);
-            if (ret < 0) return;
+            return;
         }
-        if (c == 27)
+        const auto & k = keys::get(buf);
+        std::string result = std::visit(key_visitor(), k);
+        std::cout << result << '\n';
+        // continue;
+        int i = 0;
+        {
+            int i = read(_fd, &buf, 6);
+            if (i < 0) return;
+
+            for (auto c : buf)
+            {
+                int k = static_cast<int>(c);
+
+                std::string s = std::to_string(k);
+                {
+                    int ret = write(_fd, s.c_str(), s.size());
+                    if (ret < 0) return;
+                    char space = ' ';
+                    ret        = write(_fd, &space, 1);
+                    if (ret < 0) return;
+                }
+            }
+            std::cout << "\n\r"; /*  */
+            continue;
+        }
+        if (buf[0] == 27)
         {
             auto ctrl = read_ctrl();
             if (ctrl == ctrl::up)
@@ -28,7 +83,7 @@ void term::run() noexcept
         }
         else
         {
-            _current += c;
+            _current += buf[0];
             const auto cl = clear_line();
             {
                 int ret = write(_fd, cl.c_str(), cl.size());

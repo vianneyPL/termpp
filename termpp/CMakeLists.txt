@@ -9,6 +9,8 @@ add_library(termpp
     parse.hpp
     errors.hpp
     errors.cpp
+    keys.hpp
+    keys.cpp
 )
 
 add_subdirectory(utils)
