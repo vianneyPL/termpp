@@ -1,6 +1,7 @@
 #pragma once
 
 #include <termpp/cmd.hpp>
+#include <termpp/cmd_call.hpp>
 #include <termpp/cmd_factory.hpp>
 #include <termpp/errors.hpp>
 #include <termpp/utils/command_traits.hpp>
@@ -36,7 +37,7 @@ public:
         }
         const auto & command_name = tokens[0];
         const auto & command      = _cmd_factory.get(command_name);
-        return std::visit([&tokens](const auto & cmd) { return cmd.call(tokens); }, command);
+        return std::visit([&tokens](const auto & cmd) { return trm::call(cmd, tokens); }, command);
     }
 
     const std::array<const std::string, cmds_size> & names() const
@@ -81,4 +82,4 @@ private:
         return internal::make_array(std::string{std::get<I>(commands).name()}...);
     }
 };
-}
+} // namespace trm

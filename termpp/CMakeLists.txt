@@ -2,8 +2,9 @@ add_library(termpp
     STATIC
     term.cpp
     term.hpp
-    cmd.hpp
+    cmd_call.hpp
     cmd_factory.hpp
+    cmd.hpp
     commands.hpp
     parse.hpp
     errors.hpp
