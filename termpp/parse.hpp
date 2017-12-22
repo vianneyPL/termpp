@@ -152,4 +152,4 @@ struct arg<char *>
         return "char *";
     }
 };
-}
+} // namespace trm

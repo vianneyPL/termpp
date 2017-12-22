@@ -1,4 +1,4 @@
-include_directories(${CMAKE_SOURCE_DIR}/thirdparty/catch/include)
+include_directories(${CMAKE_SOURCE_DIR}/thirdparty/catch/single_include)
 
 add_executable(test_termpp
     main.cpp
