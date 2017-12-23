@@ -16,30 +16,30 @@ const char * cmd_err_category::name() const noexcept
 }
 std::string cmd_err_category::message(int ev) const
 {
-    switch (static_cast<cmd_errc>(ev))
+    switch (static_cast<command_errc>(ev))
     {
-    case cmd_errc::empty_input:
+    case command_errc::empty_input:
         return "empty input";
-    case cmd_errc::not_enough_arguments:
+    case command_errc::not_enough_arguments:
         return "not enough arguments";
-    case cmd_errc::too_much_arguments:
+    case command_errc::too_much_arguments:
         return "too much arguments";
-    case cmd_errc::wrong_command:
+    case command_errc::wrong_command:
         return "wrong command";
-    case cmd_errc::unknown_command:
+    case command_errc::unknown_command:
         return "unknown command";
-    case cmd_errc::no_parser_found:
+    case command_errc::no_parser_found:
         return "no parser found";
-    case cmd_errc::parse_error:
+    case command_errc::parse_error:
         return "parse error";
     default:
         return "(unrecognized error)";
     }
 }
 const cmd_err_category concrete_cmd_err_category{};
-}
-std::error_code make_error_code(cmd_errc e)
+} // namespace
+std::error_code make_error_code(command_errc e)
 {
     return {static_cast<int>(e), concrete_cmd_err_category};
 }
-}
+} // namespace trm

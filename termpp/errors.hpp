@@ -4,7 +4,7 @@
 
 namespace trm
 {
-enum class cmd_errc
+enum class command_errc
 {
     empty_input = 10,
     not_enough_arguments,
@@ -15,13 +15,12 @@ enum class cmd_errc
     parse_error
 };
 
-std::error_code make_error_code(cmd_errc);
-}
+std::error_code make_error_code(command_errc);
+} // namespace trm
 
 namespace std
 {
 template <>
-struct is_error_code_enum<trm::cmd_errc> : true_type
-{
-};
-}
+struct is_error_code_enum<trm::command_errc> : true_type
+{};
+} // namespace std

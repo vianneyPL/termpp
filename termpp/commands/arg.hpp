@@ -1,5 +1,6 @@
 #pragma once
 
+#include <termpp/errors.hpp>
 #include <string>
 #include <system_error>
 #include <tuple>
@@ -15,7 +16,15 @@ struct arg_impl
 {
     static std::tuple<U, std::error_code> parse(const std::string & value)
     {
-        return Arg::parse(value);
+        try
+        {
+            return Arg::parse(value);
+        }
+        catch (...)
+        {
+            // TODO(vianney): see if it's possible to remove the constraint of default constructor on type U
+            return std::tuple{U{}, make_error_code(command_errc::parse_error)};
+        }
     }
     static std::string signature() noexcept
     {

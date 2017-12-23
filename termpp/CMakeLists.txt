@@ -6,7 +6,6 @@ add_library(termpp
     cmd_factory.hpp
     cmd.hpp
     commands.hpp
-    parse.hpp
     errors.hpp
     errors.cpp
     keys.hpp
@@ -14,10 +13,11 @@ add_library(termpp
 )
 
 add_subdirectory(utils)
+add_subdirectory(commands)
 
 target_include_directories(termpp
     INTERFACE
-    ${CMAKE_SOURCE_DIR}/thirdparty/brigand/include/standalone
+    ${CMAKE_SOURCE_DIR}/thirdparty/callable_traits/include
 )
 
 target_link_libraries(termpp
