@@ -5,8 +5,12 @@
 
 namespace trm
 {
-// clang-format off
-    enum class ctrl_c
+
+struct keys
+{
+    enum class none;
+    // clang-format off
+    enum class ctrl
     {
         a = 1, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, up = 65, down, right, left
     };
@@ -18,23 +22,22 @@ namespace trm
     {
         a = 65, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, up = 65, down, right, left
     };
-// clang-format on
+    // clang-format on
+    enum class normal
+    {
+        enter = 13,
+        del   = 127,
+        suppr,
+        escape = 27,
+        tab    = 9,
+        up     = 65,
+        down,
+        right,
+        left
+    };
 
-struct keys
-{
-    using key_type = std::variant<char, ctrl_c, alt, alt_maj>;
+    using key_type = std::variant<char, ctrl, alt, alt_maj, none, normal>;
     static const keys::key_type get(const std::array<char, 6> & buf);
-    // {
-    //     if (std::isprint(buf[0]))
-    //     {
-    //         return buf[0];
-    //     }
-    //     else if (buf[0] < 27)
-    //     {
-    //         return static_cast<ctrl_c>(buf[0]);
-    //     }
-    //     return 0;
-    // }
 };
 
 } // namespace trm

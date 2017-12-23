@@ -1,5 +1,5 @@
-#include "term.hpp"
-#include "keys.hpp"
+#include <termpp/keys.hpp>
+#include <termpp/term.hpp>
 #include <iostream>
 
 namespace trm
@@ -9,7 +9,6 @@ namespace trm
 #include <termios.h>
 #include <unistd.h>
 
-
 struct key_visitor
 {
     key_visitor()
@@ -17,17 +16,21 @@ struct key_visitor
     template <typename Key>
     std::string operator()(const Key & k)
     {
-        if constexpr (std::is_same_v<Key, ctrl_c>)
+        if constexpr (std::is_same_v<Key, keys::ctrl>)
         {
             return std::string{"ctrl: "} + std::to_string(static_cast<int>(k));
         }
-        else if (std::is_same_v<Key, alt>)
+        else if (std::is_same_v<Key, keys::alt>)
         {
             return std::string{"alt: "} + std::to_string(static_cast<int>(k));
         }
-        else if (std::is_same_v<Key, alt_maj>)
+        else if (std::is_same_v<Key, keys::alt_maj>)
         {
             return std::string{"alt_maj: "} + std::to_string(static_cast<int>(k));
+        }
+        else if (std::is_same_v<Key, keys::normal>)
+        {
+            return std::string{"normal: "} + std::to_string(static_cast<int>(k));
         }
         else if (std::is_same_v<Key, char>)
         {
@@ -42,124 +45,29 @@ void term::run() noexcept
     while (true)
     {
         std::array<char, 6> buf = {};
-        int ret                 = read(_fd, &buf, 6);
-        if (ret < 0)
-        {
-            return;
-        }
-        const auto & k = keys::get(buf);
-        std::string result = std::visit(key_visitor(), k);
-        std::cout << result << '\n';
-        // continue;
-        int i = 0;
-        {
-            int i = read(_fd, &buf, 6);
-            if (i < 0) return;
 
+        int ret = read(_fd, &buf, 6);
+        if (ret < 0) return;
+        const auto & k = keys::get(buf);
+        if (std::holds_alternative<keys::none>(k))
+        {
+            std::cerr << "Unknown key: ";
+            auto delim = ' ';
             for (auto c : buf)
             {
-                int k = static_cast<int>(c);
-
-                std::string s = std::to_string(k);
-                {
-                    int ret = write(_fd, s.c_str(), s.size());
-                    if (ret < 0) return;
-                    char space = ' ';
-                    ret        = write(_fd, &space, 1);
-                    if (ret < 0) return;
-                }
+                std::cerr << delim;
+                std::cerr << std::to_string(static_cast<int>(c));
+                delim = ',';
             }
-            std::cout << "\n\r"; /*  */
-            continue;
-        }
-        if (buf[0] == 27)
-        {
-            auto ctrl = read_ctrl();
-            if (ctrl == ctrl::up)
-            {
-                std::cout << "exit\n\r";
-                break;
-            }
+            std::cerr << "\r\n\r";
         }
         else
         {
-            _current += buf[0];
-            const auto cl = clear_line();
-            {
-                int ret = write(_fd, cl.c_str(), cl.size());
-                if (ret < 0) return;
-            }
-            {
-                int ret = write(_fd, _current.c_str(), _current.size());
-                if (ret < 0) return;
-            }
+            std::string result = std::visit(key_visitor(), k);
+            std::cout << result << "\r\n\r";
+            continue;
         }
     }
-}
-
-ctrl term::read_ctrl() noexcept
-{
-    char c1;
-    {
-        int ret = read(_fd, &c1, 1);
-        if (ret < 0) return ctrl::none;
-    }
-    char c2;
-    {
-        int ret = read(_fd, &c2, 1);
-        if (ret < 0) return ctrl::none;
-    }
-
-    if (c1 == '[' || c1 == 'O')
-    {
-        switch (c2)
-        {
-        case 'A':
-            return ctrl::up;
-        case 'B':
-            return ctrl::down;
-        case 'C':
-            return ctrl::right;
-        case 'D':
-            return ctrl::left;
-        case 'F':
-            return ctrl::end;
-        case 'H':
-            return ctrl::home;
-        }
-    }
-    if (c1 == '[' && c2 >= '1' && c2 <= '8')
-    {
-        {
-            int ret = read(_fd, &c1, 1);
-            if (ret < 0) return ctrl::none;
-        }
-        /* extended escape */
-        if (c1 == '~')
-        {
-            switch (c2)
-            {
-            case '2':
-                return ctrl::insert;
-            case '3':
-                return ctrl::del;
-            case '5':
-                return ctrl::page_up;
-            case '6':
-                return ctrl::page_down;
-            case '7':
-                return ctrl::home;
-            case '8':
-                return ctrl::end;
-            }
-        }
-        while (c1 != -1 && c1 != '~')
-        {
-            int ret = read(_fd, &c1, 1);
-            if (ret < 0) return ctrl::none;
-        }
-    }
-    return ctrl::none;
 }
 
 bool term::is_supported()
@@ -244,4 +152,4 @@ void term::unset_term()
 }
 
 #endif
-}
+} // namespace trm

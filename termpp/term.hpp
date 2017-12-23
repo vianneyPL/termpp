@@ -12,21 +12,6 @@
 
 namespace trm
 {
-enum class ctrl
-{
-    none      = 0,
-    up        = -20,
-    down      = -21,
-    left      = -22,
-    right     = -23,
-    del       = -24,
-    home      = -25,
-    end       = -26,
-    insert    = -27,
-    page_up   = -28,
-    page_down = -29
-};
-
 class term
 {
 
@@ -41,9 +26,6 @@ public:
     }
 
     void run() noexcept;
-
-private:
-    ctrl read_ctrl() noexcept;
 
 private:
     std::string _current;
@@ -94,4 +76,4 @@ inline std::string clear_lines(unsigned n = 1)
 {
     return "\e[0m" + clear_before_cursor() + ((n) ? repeat(n, clear_line() + move_up()) : std::string(""));
 }
-}
+} // namespace trm
