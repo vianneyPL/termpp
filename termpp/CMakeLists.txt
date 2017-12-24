@@ -10,6 +10,7 @@ add_library(termpp
 
 add_subdirectory(utils)
 add_subdirectory(commands)
+add_subdirectory(controls)
 
 target_include_directories(termpp
     INTERFACE
@@ -18,11 +19,12 @@ target_include_directories(termpp
 
 target_link_libraries(termpp
     utils
+    controls
 )
 
 set_target_properties(termpp PROPERTIES LINKER_LANGUAGE CXX)
 
-target_include_directories(termpp INTERFACE
+target_include_directories(termpp PUBLIC
 $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
 # $<INSTALL_INTERFACE:${CMAKE_INSTALL_NAME_DIR}/category>
 )

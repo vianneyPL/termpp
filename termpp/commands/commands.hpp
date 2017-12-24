@@ -1,11 +1,8 @@
 #pragma once
 
-#include "callback.hpp"
-#include "command.hpp"
+#include <termpp/commands/command.hpp>
 #include <tuple>
 #include <unordered_map>
-#include <unordered_set>
-#include <variant>
 
 namespace trm
 {

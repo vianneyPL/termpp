@@ -9,39 +9,16 @@ namespace trm
 #include <termios.h>
 #include <unistd.h>
 
-struct key_visitor
+template <typename T>
+void print()
 {
-    key_visitor()
-    {}
-    template <typename Key>
-    std::string operator()(const Key & k)
-    {
-        if constexpr (std::is_same_v<Key, keys::ctrl>)
-        {
-            return std::string{"ctrl: "} + std::to_string(static_cast<int>(k));
-        }
-        else if (std::is_same_v<Key, keys::alt>)
-        {
-            return std::string{"alt: "} + std::to_string(static_cast<int>(k));
-        }
-        else if (std::is_same_v<Key, keys::alt_maj>)
-        {
-            return std::string{"alt_maj: "} + std::to_string(static_cast<int>(k));
-        }
-        else if (std::is_same_v<Key, keys::normal>)
-        {
-            return std::string{"normal: "} + std::to_string(static_cast<int>(k));
-        }
-        else if (std::is_same_v<Key, char>)
-        {
-            return std::string{"char: "} + std::string{static_cast<char>(k)};
-        }
-        return std::string{"none"};
-    }
-};
+    std::cout << __PRETTY_FUNCTION__;
+}
 
 void term::run() noexcept
 {
+    const char * prompt = "> ";
+    write(1, prompt, 2);
     while (true)
     {
         std::array<char, 6> buf = {};
@@ -61,11 +38,15 @@ void term::run() noexcept
             }
             std::cerr << "\r\n\r";
         }
+        else if (std::holds_alternative<char>(k))
+        {
+            char c = std::get<char>(k);
+            write(1, &c, 1);
+            _current += c;
+        }
         else
         {
-            std::string result = std::visit(key_visitor(), k);
-            std::cout << result << "\r\n\r";
-            continue;
+            auto err = _ctrls->call(k);
         }
     }
 }
@@ -152,4 +133,12 @@ void term::unset_term()
 }
 
 #endif
+
+void term::print_line()
+{
+    std::cout << "\r\n" << _current << "\r\n";
+    _current.clear();
+    const char * prompt = "> ";
+    write(1, prompt, 2);
+}
 } // namespace trm

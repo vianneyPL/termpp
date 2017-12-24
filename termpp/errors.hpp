@@ -11,6 +11,7 @@ enum class command_errc
     too_much_arguments,
     wrong_command,
     unknown_command,
+    unknown_control,
     no_parser_found,
     parse_error
 };

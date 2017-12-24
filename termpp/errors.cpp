@@ -28,6 +28,8 @@ std::string cmd_err_category::message(int ev) const
         return "wrong command";
     case command_errc::unknown_command:
         return "unknown command";
+    case command_errc::unknown_control:
+        return "unknown control";
     case command_errc::no_parser_found:
         return "no parser found";
     case command_errc::parse_error:

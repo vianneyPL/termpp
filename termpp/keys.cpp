@@ -98,10 +98,10 @@ static const std::map<std::array<char, 6>, keys::keys::key_type> initialize_keys
 {
     std::map<std::array<char, 6>, keys::key_type> keys_map;
     initialize_ctrl(keys_map);
-    initialize_printable(keys_map);
     initialize_alt(keys_map);
     initialize_alt_maj(keys_map);
     initialize_normal(keys_map);
+    initialize_printable(keys_map);
     return keys_map;
 }
 

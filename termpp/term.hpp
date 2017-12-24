@@ -1,5 +1,8 @@
 #pragma once
+
+#include <termpp/controls/controls.hpp>
 #include <termpp/utils/make_array.hpp>
+#include <memory>
 
 #ifdef _WIN32 /* Windows platform, either MinGW or Visual Studio (MSVC) */
 #include <windows.h>
@@ -27,8 +30,16 @@ public:
 
     void run() noexcept;
 
+    void set_controls(std::unique_ptr<controls_interface> ctrls)
+    {
+        _ctrls.swap(ctrls);
+    }
+
+    void print_line();
+
 private:
     std::string _current;
+    std::unique_ptr<controls_interface> _ctrls;
 
 #ifndef _WIN32
     int _fd = STDIN_FILENO;
