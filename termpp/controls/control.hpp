@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../keys.hpp"
+#include <termpp/keys.hpp>
 #include <termpp/utils/brigand_wrapper.hpp>
 #include <termpp/utils/function_traits.hpp>
 #include <boost/callable_traits.hpp>

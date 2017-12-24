@@ -1,6 +1,6 @@
 #pragma once
 
-#include "control.hpp"
+#include <termpp/controls/control.hpp>
 #include <termpp/errors.hpp>
 #include <termpp/utils/make_array.hpp>
 #include <iostream>
