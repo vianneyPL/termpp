@@ -91,6 +91,14 @@ static void initialize_normal(std::map<std::array<char, 6>, keys::key_type> & ke
             std::array<char, 6> arr = {27, 91, c};
             keys_map.insert(std::make_pair(arr, static_cast<keys::normal>(c)));
         }
+        {
+            std::array<char, 6> arr = {27, 91, 70};
+            keys_map.insert(std::make_pair(arr, static_cast<keys::normal>(70)));
+        }
+        {
+            std::array<char, 6> arr = {27, 91, 72};
+            keys_map.insert(std::make_pair(arr, static_cast<keys::normal>(72)));
+        }
     }
 }
 

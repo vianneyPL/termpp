@@ -25,15 +25,17 @@ struct keys
     // clang-format on
     enum class normal
     {
-        enter = 13,
-        del   = 127,
-        suppr,
-        escape = 27,
         tab    = 9,
+        enter  = 13,
+        escape = 27,
         up     = 65,
         down,
         right,
-        left
+        left,
+        endofline = 70,
+        home      = 72,
+        del       = 127,
+        suppr
     };
 
     using key_type = std::variant<char, ctrl, alt, alt_maj, none, normal>;
