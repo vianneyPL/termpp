@@ -21,4 +21,6 @@
 
 [x] Remove trm::command (except for commands constructor) and replace with free functions
 
+[v] Remove trm::control (except for controls constructor) and replace with free functions
+
 [x] See what's possible with travis/coverage, etc...

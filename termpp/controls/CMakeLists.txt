@@ -1,7 +1,6 @@
 add_library(controls
     STATIC
     control.hpp
-    controls.cpp
     controls.hpp
 )
 

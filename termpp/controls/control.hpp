@@ -11,38 +11,19 @@
 
 namespace trm
 {
-template <typename F>
+template <typename Function>
 struct control
 {
-    using function_type = F;
+    using function_type = Function;
 
-public:
     constexpr control() = delete;
-    constexpr control(keys::key_type k, F f)
-        : _k{k}
-        , _f{f}
+    constexpr control(keys::key_type k, function_type f)
+        : _key{k}
+        , _function{f}
     {}
 
-    const keys::key_type key() const noexcept
-    {
-        return _k;
-    }
-
-    template <typename... Args>
-    boost::callable_traits::return_type_t<F> operator()(Args &&... args)
-    {
-        static_assert(std::is_invocable_v<F, Args...>, "cannot call control with these arguments");
-        if constexpr (!boost::callable_traits::has_void_return_v<F>)
-        {
-            return _f(std::forward<Args &&...>(args...));
-        }
-        _f(std::forward<Args &&...>(args...));
-    }
-
-    function_type _f;
-
-private:
-    const keys::key_type _k;
+    const keys::key_type _key;
+    const function_type _function;
 };
 
 template <>
