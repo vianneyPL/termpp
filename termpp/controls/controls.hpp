@@ -15,7 +15,7 @@ struct controls_interface
     controls_interface() = default;
     virtual ~controls_interface()
     {}
-    virtual std::error_code call(const keys::key_type key)
+    virtual std::error_code operator()(const keys::key_type key)
     {
         std::cout << "override didn't work...\n";
     }
@@ -55,14 +55,14 @@ public:
         , _keys(initialize_keys(std::forward_as_tuple(args...), std::make_index_sequence<controls_count>{}))
     {}
 
-    std::error_code call(const keys::key_type key) override
+    std::error_code operator()(const keys::key_type key) override
     {
         if (!std::count(std::cbegin(_keys), std::cend(_keys), key))
         {
             return make_error_code(command_errc::unknown_control);
         }
         const auto ctrl = _control_map.at(key);
-        std::visit([](auto & function) { function(); }, ctrl);
+        std::visit([](auto & function) { std::invoke(function); }, ctrl);
         return {};
     }
 

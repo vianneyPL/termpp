@@ -46,7 +46,7 @@ void term::run() noexcept
         }
         else
         {
-            auto err = _ctrls->call(k);
+            auto err = std::invoke(*_ctrls, k);
         }
     }
 }
