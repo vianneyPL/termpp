@@ -18,9 +18,7 @@ struct controls_interface
     virtual ~controls_interface()
     {}
     virtual std::error_code operator()(const keys::key_type key)
-    {
-        std::cout << "override didn't work...\n";
-    }
+    {}
     // virtual std::error_code operator()(const keys::key_type key);
 };
 
