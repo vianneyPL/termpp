@@ -3,9 +3,11 @@
 #include <termpp/controls/control.hpp>
 #include <termpp/errors.hpp>
 #include <termpp/utils/make_array.hpp>
-#include <iostream>
+#include <termpp/utils/static_unique_pointer_cast.hpp>
+#include <memory>
 #include <tuple>
 #include <unordered_map>
+#include <variant>
 
 namespace trm
 {
@@ -45,14 +47,14 @@ public:
     using any_function = brigand::as_variant<functions_list>;
 
 private:
-    static constexpr inline std::size_t controls_count = 1;
+    static constexpr inline std::size_t controls_count = brigand::size<controls_list>::value;
 
 public:
     virtual ~controls()
     {}
     controls(Args... args)
-        : _control_map(add_controls(std::forward_as_tuple(args...)))
-        , _keys(initialize_keys(std::forward_as_tuple(args...), std::make_index_sequence<controls_count>{}))
+        : _control_map(add_controls(std::make_tuple(args...)))
+        , _keys(initialize_keys(std::make_tuple(args...), std::make_index_sequence<controls_count>{}))
     {}
 
     std::error_code operator()(const keys::key_type key) override
@@ -73,15 +75,14 @@ private:
     std::unordered_map<keys::key_type, any_function> add_controls(std::tuple<Args...> args)
     {
         std::unordered_map<keys::key_type, any_function> cmds;
-        std::apply(
-            [&cmds](auto arg) {
-                if constexpr (is_control_v<decltype(arg)>)
-                {
-                    cmds.insert({arg._key, arg._function});
-                }
-            },
-            args);
+        add_controls_impl(cmds, args, std::make_index_sequence<controls_count>{});
         return cmds;
+    }
+
+    template <std::size_t... I>
+    void add_controls_impl(std::unordered_map<keys::key_type, any_function> & cmds, std::tuple<Args...> args, std::index_sequence<I...>)
+    {
+        (cmds.insert({std::get<I>(args)._key, std::get<I>(args)._function}), ...);
     }
 
     template <std::size_t... I>
@@ -90,4 +91,12 @@ private:
         return internal::make_array(std::get<I>(controls)._key...);
     }
 };
+
+template <typename... Args>
+std::unique_ptr<controls_interface> make_controls(Args... args)
+{
+    auto ctrls = std::make_unique<trm::controls<Args...>>(args...);
+    return internal::static_unique_pointer_cast<controls_interface>(std::move(ctrls));
+}
+
 } // namespace trm

@@ -1,8 +1,12 @@
 #pragma once
 
 #include <termpp/controls/controls.hpp>
+#include <termpp/line.hpp>
+#include <termpp/utils/length.hpp>
 #include <termpp/utils/make_array.hpp>
+#include <termpp/utils/static_unique_pointer_cast.hpp>
 #include <memory>
+#include <string_view>
 
 #ifdef _WIN32 /* Windows platform, either MinGW or Visual Studio (MSVC) */
 #include <windows.h>
@@ -35,9 +39,81 @@ public:
         _ctrls.swap(ctrls);
     }
 
+    void reprint_line();
     void print_line();
 
+    inline void move_to_pos(std::size_t x)
+    {
+        const std::string go_to_pos{"\r\x1b[" + std::to_string(x) + "C"};
+        write(1, std::data(go_to_pos), std::size(go_to_pos));
+        _index = x;
+    }
+
+    inline void set_cursor_after()
+    {
+        const std::string go_to_pos{"\r\x1b[" + std::to_string(_index + 1) + "C"};
+        write(1, std::data(go_to_pos), std::size(go_to_pos));
+    }
+
+    inline void move_left()
+    {
+        auto index = _line.advance(-1);
+        move_to_pos(index);
+    }
+
+    inline void move_right()
+    {
+        auto index = _line.advance(1);
+        move_to_pos(index);
+    }
+
+    inline void del()
+    {
+        _line.del();
+        reset_line();
+    }
+
+    inline void home()
+    {
+        constexpr const char * go_home = "\r";
+        write(1, &go_home, 1);
+        _index = 0;
+    }
+
+    inline void end_of_line()
+    {
+        const std::size_t line_size = std::size(_current);
+        if (line_size)
+        {
+            move_to_pos(line_size);
+        }
+    }
+
+    inline void exit()
+    {
+        _is_exit = true;
+    }
+
+    inline void new_line()
+    {
+        constexpr const char * newline = "\r\n";
+        write(1, newline, 2);
+    }
+
+    inline void reset_line()
+    {
+        const auto & buffer = _line.buffer();
+        constexpr std::string_view empty_line{"\x1b[2K\r", internal::length("\x1b[2K\r")};
+        move_to_pos(std::size(buffer));
+        write(1, std::data(empty_line), std::size(empty_line));
+        write(1, std::data(buffer), std::size(buffer));
+        move_to_pos(_line.index());
+    }
+
 private:
+    line _line{};
+    bool _is_exit{false};
+    std::size_t _index{};
     std::string _current;
     std::unique_ptr<controls_interface> _ctrls;
 

@@ -4,6 +4,7 @@ add_library(utils
     function_traits.hpp
     make_array.hpp
     split.hpp
+    static_unique_pointer_cast.hpp
 )
 
 set_target_properties(utils PROPERTIES LINKER_LANGUAGE CXX)

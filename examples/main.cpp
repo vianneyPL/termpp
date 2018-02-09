@@ -1,17 +1,17 @@
 #include <termpp/term.hpp>
 #include <iostream>
 
-template <typename T>
-void print(T && t)
-{
-    std::cout << __PRETTY_FUNCTION__ << '\n';
-}
-
 int main()
 {
     trm::term t{};
-    auto ctrl = trm::control{trm::keys::normal::enter, [&t] { t.print_line(); }};
-    t.set_controls(std::move(std::unique_ptr<trm::controls_interface>(static_cast<trm::controls_interface *>(new trm::controls{ctrl}))));
+    const auto exit_1 = trm::control{trm::keys::ctrl::c, [&t] { t.exit(); }};
+    const auto exit_2 = trm::control{trm::keys::ctrl::d, [&t] { t.exit(); }};
+    const auto del    = trm::control{trm::keys::normal::del, [&t] { t.del(); }};
+    const auto left   = trm::control{trm::keys::normal::left, [&t] { t.move_left(); }};
+    const auto right  = trm::control{trm::keys::normal::right, [&t] { t.move_right(); }};
+    const auto enter  = trm::control{trm::keys::normal::enter, [&t] { t.print_line(); }};
+    // print<decltype(ctrls)>();
+    t.set_controls(trm::make_controls(enter, exit_1, exit_2, left, right, del));
     t.run();
     return 1;
 }

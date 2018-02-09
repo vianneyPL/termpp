@@ -1,6 +1,7 @@
 #include <termpp/keys.hpp>
 #include <termpp/term.hpp>
 #include <iostream>
+#include <tuple>
 
 namespace trm
 {
@@ -15,18 +16,28 @@ void print()
     std::cout << __PRETTY_FUNCTION__;
 }
 
+static const auto get_key(int fd)
+{
+    std::array<char, 6> buf = {};
+
+    int ret = read(fd, &buf, 6);
+    if (ret < 0) return std::make_tuple(buf, keys::key_type{keys::none{}});
+    return std::make_tuple(buf, keys::get(buf));
+}
+
 void term::run() noexcept
 {
-    const char * prompt = "> ";
-    write(1, prompt, 2);
-    while (true)
+    reset_line();
+    // reprint_line();
+    while (!_is_exit)
     {
-        std::array<char, 6> buf = {};
-
-        int ret = read(_fd, &buf, 6);
-        if (ret < 0) return;
-        const auto & k = keys::get(buf);
-        if (std::holds_alternative<keys::none>(k))
+        const auto [buf, key] = get_key(_fd);
+        // should be of the form:
+        // getkey()
+        // .then(process)
+        // .fail(is_unknown_key)
+        // .fail(/*fatal*/ exit)
+        if (std::holds_alternative<keys::none>(key))
         {
             std::cerr << "Unknown key: ";
             auto delim = ' ';
@@ -38,15 +49,15 @@ void term::run() noexcept
             }
             std::cerr << "\r\n\r";
         }
-        else if (std::holds_alternative<char>(k))
+        else if (std::holds_alternative<char>(key))
         {
-            char c = std::get<char>(k);
-            write(1, &c, 1);
-            _current += c;
+            char c = std::get<char>(key);
+            _line.insert(c);
+            reset_line();
         }
         else
         {
-            auto err = std::invoke(*_ctrls, k);
+            auto err = std::invoke(*_ctrls, key);
         }
     }
 }
@@ -134,11 +145,22 @@ void term::unset_term()
 
 #endif
 
+void term::reprint_line()
+{
+    auto i = _index;
+    move_to_pos(std::size(_current));
+    clear_line();
+    move_to_pos(0);
+    _index = i;
+    write(1, _current.c_str(), std::size(_current));
+    move_to_pos(_index);
+    set_cursor_after();
+}
+
 void term::print_line()
 {
-    std::cout << "\r\n" << _current << "\r\n";
-    _current.clear();
-    const char * prompt = "> ";
-    write(1, prompt, 2);
+    std::cout << "\r\n" << _line.content() << "\r\n";
+    _line.reset();
+    reset_line();
 }
 } // namespace trm
